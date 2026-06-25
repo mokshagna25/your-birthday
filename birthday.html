@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #ffe6ee;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Screen 1: The Button Box */
+        .card-container {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4);
+            text-align: center;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .card-container h2 {
+            color: #d6336c;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .open-btn {
+            background-color: #ff2a6d;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 42, 109, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .open-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Screen 2: Main Animation Stage */
+        .stage {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            position: relative;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            z-index: 5;
+        }
+
+        /* Left Side: Birthday Text Messaging */
+        .text-message {
+            width: 50%;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            color: #d6336c;
+            font-size: 26px;
+            line-height: 2;
+            opacity: 0;
+            transition: opacity 2s ease, transform 2s ease;
+            transform: translateX(-20px);
+        }
+
+        /* Right Side: Tree Container Layout */
+        .tree-container {
+            width: 45%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        /* SVG Graphic Stage Alignment Frame */
+        .svg-tree-stage {
+            width: 250px;
+            height: 400px;
+            margin-bottom: 50px;
+        }
+
+        /* Scalable vector trunk style */
+        .trunk-vector {
+            fill: #e096a1;
+            height: 0px;
+            transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Scalable vector heart crown style */
+        .crown-vector {
+            fill: #ff4d88;
+            opacity: 0;
+            transform: scale(0);
+            transform-origin: 125px 220px; /* Perfectly pins transform scaling anchors directly above trunk line */
+            transition: opacity 1.5s ease, transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Burst Heart Particles using Safe CSS Animation */
+        .burst-heart {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 4;
+            user-select: none;
+            left: 50%;
+            bottom: 230px;
+            transform: translate(-50%, 0);
+            animation: burstOut 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes burstOut {
+            0% {
+                transform: translate(-50%, 0) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(calc(-50% + var(--x)), var(--y)) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Raining Heart Particles */
+        .raining-heart {
+            position: absolute;
+            top: -50px;
+            pointer-events: none;
+            z-index: 3;
+            user-select: none;
+            animation: rainFall linear forwards;
+        }
+
+        @keyframes rainFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+    </style>
+
+    <script>
+        const heartTypes = ['💖', '❤️', '🖤', '💕', '💜', '💛', '🤍', '💙', '💝'];
+
+        function treeHeartBurst() {
+            const container = document.getElementById('treeContainer');
+            if (!container) return;
+            const particleCount = 40; 
+
+            for (let i = 0; i < particleCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('burst-heart');
+                heart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 150 + 50; 
+                const xDist = Math.cos(angle) * velocity;
+                const yDist = Math.sin(angle) * velocity;
+
+                heart.style.setProperty('--x', xDist + 'px');
+                heart.style.setProperty('--y', yDist + 'px');
+
+                container.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 1500);
+            }
+        }
+
+        function startHeartRain() {
+            setInterval(() => {
+                const rainHeart = document.createElement('div');
+                rainHeart.classList.add('raining-heart');
+                
+                rainHeart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+                rainHeart.style.left = Math.random() * 100 + 'vw';
+                
+                const size = Math.random() * 20 + 16; 
+                rainHeart.style.fontSize = size + 'px';
+                
+                const duration = Math.random() * 3 + 3; 
+                rainHeart.style.animationDuration = duration + 's';
+
+                document.body.appendChild(rainHeart);
+
+                setTimeout(() => {
+                    rainHeart.remove();
+                }, duration * 1000);
+            }, 80); 
+        }
+
+        function startSurprise() {
+            document.getElementById('welcomeCard').style.display = 'none';
+            
+            const stage = document.getElementById('surpriseStage');
+            stage.style.display = 'flex';
+
+            // 1. Grow tree trunk smoothly inside vector landscape bounds
+            const trunk = document.getElementById('treeTrunk');
+            setTimeout(() => {
+                if (trunk) {
+                    trunk.style.height = '140px';
+                }
+            }, 100);
+
+            // 2. Bloom tree crown vector graphic flawlessly centered
+            const crown = document.getElementById('treeCrown');
+            setTimeout(() => {
+                if (crown) {
+                    crown.style.opacity = '1';
+                    crown.style.transform = 'scale(1)';
+                }
+                treeHeartBurst(); 
+            }, 1400);
+
+            // 3. Start falling heart rain sequence
+            setTimeout(() => {
+                startHeartRain();
+            }, 2000);
+
+            // 4. Fade in the birthday text messaging board
+            const text = document.getElementById('messageText');
+            setTimeout(() => {
+                if (text) {
+                    text.style.opacity = '1';
+                    text.style.transform = 'translateX(0)';
+                }
+            }, 2600);
+        }
+    </script>
+</head>
+<body>
+
+    <!-- SCREEN 1: Open Button -->
+    <div class="card-container" id="welcomeCard">
+        <h2>Ready for your surprise?</h2>
+        <button class="open-btn" onclick="startSurprise()">Open Surprise</button>
+    </div>
+
+    <!-- SCREEN 2: Visual Stage Layout -->
+    <div class="stage" id="surpriseStage">
+        
+        <!-- Letter Text Block -->
+        <div class="text-message" id="messageText">
+            Hey you 💕<br>
+            Happy Birthday Lahari🎂<br>
+            May God bless you 🌟<br>
+            And give u every happiness ✨<br>
+            all your wishes should come true ~ 🤍
+        </div>
+
+        <!-- The Growing Tree Vector Graphic Canvas Stage -->
+        <div class="tree-container" id="treeContainer">
+            <svg class="svg-tree-stage" viewBox="0 0 250 400">
+                <!-- Vertical Line Growing Tree Trunk Bar -->
+                <rect id="treeTrunk" class="trunk-vector" x="117" y="220" width="16" rx="8" />
+                
+                <!-- Perfectly Proportioned Native SVG Vector Path Heart Crown -->
+                <path id="treeCrown" class="crown-vector" d="M125 220 C125 220 20 140 20 75 C20 30 60 10 95 10 C115 10 125 25 125 25 C125 25 135 10 155 10 C190 10 230 30 230 75 C230 140 125 220 125 220 Z" />
+            </svg>
+        </div>
+
+    </div>
+
+</body>
+</html>
